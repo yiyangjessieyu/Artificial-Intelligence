@@ -19,12 +19,7 @@ class SlidingPuzzleGraph(Graph):
         n = len(state)  # the size of the puzzle
 
         # Find i and j such that state[i][j] == BLANK
-        for row in range(n):
-            for col in range(n):
-                print(state[row][col])
-                if state[row][col] == BLANK:
-                    i, j = row, col
-                    break
+        i, j = next((i, j) for i in range(n) for j in range(n) if state[i][j] == BLANK)
         # [for row in range (n) for col in range (n) if state[row][col] == BLANK]
 
         arcs = []
@@ -67,10 +62,13 @@ class SlidingPuzzleGraph(Graph):
         state_1d = [element for row in state for element in row]
 
         for i in range(n * n):
-            if goal[i] != state_1d[i]:
+            if goal[i] != state_1d[i + 1]:
                 return False
 
-        return True
+        if state[0][0] == BLANK:
+            return True
+        else:
+            return False
 
 
 class BFSFrontier(Frontier):
