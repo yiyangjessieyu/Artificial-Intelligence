@@ -55,14 +55,14 @@ class SlidingPuzzleGraph(Graph):
         otherwise. There is only one goal state in this problem."""
 
         n = len(state)
-        goal = [num for num in range(n * n)]
+        goal = [num for num in range(1, n * n)]
 
         # converting 2d list into 1d
         # using list comprehension
         state_1d = [element for row in state for element in row]
 
-        for i in range(n * n):
-            if goal[i] != state_1d[i + 1]:
+        for i in range(1, n * n):
+            if goal[i - 1] != state_1d[i]:
                 return False
 
         if state[0][0] == BLANK:
@@ -110,6 +110,18 @@ def main():
     solutions = generic_search(graph, BFSFrontier())
     print_actions(next(solutions))
 
+    graph = SlidingPuzzleGraph([[3, ' '],
+                                [1, 2]])
+
+    solutions = generic_search(graph, BFSFrontier())
+    print_actions(next(solutions))
+
+    graph = SlidingPuzzleGraph([[1, ' ', 2],
+                                [6,  4,  3],
+                                [7,  8,  5]])
+
+    solutions = generic_search(graph, BFSFrontier())
+    print_actions(next(solutions))
 
 if __name__ == "__main__":
     main()
