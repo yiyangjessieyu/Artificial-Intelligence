@@ -61,8 +61,8 @@ class SlidingPuzzleGraph(Graph):
         # using list comprehension
         state_1d = [element for row in state for element in row]
 
-        for i in range(1, n * n):
-            if goal[i - 1] != state_1d[i]:
+        for i in range(n * n - 1):
+            if goal[i] != state_1d[i+1]:
                 return False
 
         if state[0][0] == BLANK:
@@ -110,18 +110,6 @@ def main():
     solutions = generic_search(graph, BFSFrontier())
     print_actions(next(solutions))
 
-    graph = SlidingPuzzleGraph([[3, ' '],
-                                [1, 2]])
-
-    solutions = generic_search(graph, BFSFrontier())
-    print_actions(next(solutions))
-
-    graph = SlidingPuzzleGraph([[1, ' ', 2],
-                                [6,  4,  3],
-                                [7,  8,  5]])
-
-    solutions = generic_search(graph, BFSFrontier())
-    print_actions(next(solutions))
 
 if __name__ == "__main__":
     main()
