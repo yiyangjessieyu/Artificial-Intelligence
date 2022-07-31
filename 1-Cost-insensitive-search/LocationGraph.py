@@ -27,32 +27,41 @@ class LocationGraph(Graph):
 
         tail_x, tail_y = self.location[tail]
 
-        result_string = ""
+        result = []
 
-        for node, location in self.location.items():
+        sorted_dict = {key: value for key, value in sorted(self.location.items())}
+
+        for node, location in sorted_dict.items():
             if node != tail:
 
-                x, y = location
+                node_x, node_y = location
 
-                x_diff = abs(tail_x - x)
-                y_diff = abs(tail_y - y)
+                x_diff = abs(float(tail_x - node_x))
+                y_diff = float(abs(tail_y - node_y))
+                hypotenuse = float(sqrt(x_diff ** 2 + y_diff ** 2))
 
-                if x == 0 and self.is_within_radius(tail_y, y):
-                    result_string += str(Arc(tail, node,
-                                             tail + '->' + node,
-                                             cost=y_diff
-                                             ))
+                if node_x == tail_x and self.is_within_radius(tail_y, node_y):
+                    result.append(Arc(tail, node,
+                                      tail + '->' + node,
+                                      cost=y_diff
+                                      )
+                                  )
 
-                elif y == 0 and self.is_within_radius(tail_x, x):
-                    result_string += str(Arc(tail, node,
-                                             tail + '->' + node,
-                                             cost=x_diff
-                                             ))
-        return result_string
-                #
-                # hypotenuse = sqrt(x_diff ** 2 + y_diff ** 2)
-                # elif hypotenuse <= float(self.radius):
-                #     return True
+                elif node_y == tail_y and self.is_within_radius(tail_x, node_x):
+                    result.append(Arc(tail, node,
+                                      tail + '->' + node,
+                                      cost=x_diff
+                                      )
+                                  )
+
+                elif hypotenuse <= float(self.radius):
+                    result.append(Arc(tail, node,
+                                      tail + '->' + node,
+                                      cost=hypotenuse
+                                      )
+                                  )
+
+        return result
 
 
 def main():
@@ -75,6 +84,34 @@ def main():
     print()
 
     for arc in graph.outgoing_arcs('C'):
+        print(arc)
+
+    graph = LocationGraph(
+        location={'SW': (-2, -2),
+                  'NW': (-2, 2),
+                  'NE': (2, 2),
+                  'SE': (2, -2)},
+        radius=5,
+        starting_nodes=['NE'],
+        goal_nodes={'SW'}
+    )
+
+    for arc in graph.outgoing_arcs('NE'):
+        print(arc)
+
+    print()
+
+    for arc in graph.outgoing_arcs('NW'):
+        print(arc)
+
+    print()
+
+    for arc in graph.outgoing_arcs('SW'):
+        print(arc)
+
+    print()
+
+    for arc in graph.outgoing_arcs('SE'):
         print(arc)
 
 
