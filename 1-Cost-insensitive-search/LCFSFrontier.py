@@ -1,16 +1,49 @@
 import collections
+from math import sqrt
 
 from search import *
 
 
-class LCFSFrontier():
+class LCFSFrontier(Frontier):
 
-    def __init__(self):
+    def __init__(self, ):
+        """The constructor takes no argument. It initialises the
+        container to an empty stack."""
         self.container = collections.deque([])
 
-    def add(self, tuple):
+    def add(self, path):
+        """Store the given path by adding a new path to the frontier. A path is a sequence (tuple) of
+        Arc objects. You should override this method. """
         self.container.append(path)
+        print("=======================")
+        for item in self.container:
+            print(item)
+        print("=======================")
+        print('\n')
 
+        sorted_by_cost = sorted(self.container,
+                                key = lambda x : x[0][3]+x[1][3],
+                                reverse=True)
+
+# TODO: use heap sort from heapq. pay attention to the "implementation notes" to see how you can make it stable.
+        # https://docs.python.org/3/library/heapq.html
+        self.container = sorted_by_cost
+
+    def __iter__(self):
+        """We don't need a separate iterator object. Just return self. You
+        don't need to change this method."""
+        return self
+
+    def __next__(self):
+        """Selects, removes, and returns a path on the frontier if there is
+        any. Recall that a path is a sequence (tuple) of Arc
+        objects. Override this method to achieve a desired search
+        strategy. If there nothing to return this should raise a
+        StopIteration exception."""
+        if len(self.container) > 0:
+            return self.container.pop()
+        else:
+            raise StopIteration
 
 
 class LocationGraph(Graph):
@@ -76,23 +109,13 @@ class LocationGraph(Graph):
 
 
 def main():
-    graph = FunkyNumericGraph(4)
-    for node in graph.starting_nodes():
-        print(node)
+    frontier = LCFSFrontier()
+    frontier.add((Arc(None, None, None, 17),))
+    frontier.add((Arc(None, None, None, 11), Arc(None, None, None, 4)))
+    frontier.add((Arc(None, None, None, 7), Arc(None, None, None, 8)))
 
-    graph = FunkyNumericGraph(4)
-    for arc in graph.outgoing_arcs(7):
-        print(arc)
-
-    graph = FunkyNumericGraph(3)
-    solutions = generic_search(graph, BFSFrontier())
-    print_actions(next(solutions))
-    print()
-    print_actions(next(solutions))
-
-    graph = FunkyNumericGraph(3)
-    solutions = generic_search(graph, BFSFrontier())
-    print_actions(next(dropwhile(lambda path: path[-1].head <= 10, solutions)))
+    for path in frontier:
+        print(path)
 
 
 if __name__ == "__main__":
