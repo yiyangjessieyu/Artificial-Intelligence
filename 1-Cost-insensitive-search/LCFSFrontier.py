@@ -1,4 +1,4 @@
-import collections
+from heapq import *
 from math import sqrt
 
 from search import *
@@ -9,25 +9,25 @@ class LCFSFrontier(Frontier):
     def __init__(self, ):
         """The constructor takes no argument. It initialises the
         container to an empty stack."""
-        self.container = collections.deque([])
+        self.heap = []
+        heapify(self.heap)
 
     def add(self, path):
         """Store the given path by adding a new path to the frontier. A path is a sequence (tuple) of
         Arc objects. You should override this method. """
-        self.container.append(path)
-        print("=======================")
-        for item in self.container:
-            print(item)
-        print("=======================")
-        print('\n')
 
-        sorted_by_cost = sorted(self.container,
-                                key = lambda x : x[0][3]+x[1][3],
-                                reverse=True)
+        sum_cost = 0
+        for arc in path:
+            if arc == '':
+                cost = 0
+            else:
+                cost = arc[3]
+            sum_cost += cost
 
-# TODO: use heap sort from heapq. pay attention to the "implementation notes" to see how you can make it stable.
+        heappush(self.heap, path)
+
+        # TODO: use heap sort from heapq. pay attention to the "implementation notes" to see how you can make it stable.
         # https://docs.python.org/3/library/heapq.html
-        self.container = sorted_by_cost
 
     def __iter__(self):
         """We don't need a separate iterator object. Just return self. You
@@ -40,8 +40,8 @@ class LCFSFrontier(Frontier):
         objects. Override this method to achieve a desired search
         strategy. If there nothing to return this should raise a
         StopIteration exception."""
-        if len(self.container) > 0:
-            return self.container.pop()
+        if len(self.heap) > 0:
+            return heappop(self.heap)
         else:
             raise StopIteration
 
