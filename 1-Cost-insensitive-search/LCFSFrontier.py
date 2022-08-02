@@ -1,3 +1,4 @@
+import itertools
 from heapq import *
 from math import sqrt
 
@@ -9,6 +10,9 @@ class LCFSFrontier(Frontier):
     def __init__(self, ):
         """The constructor takes no argument. It initialises the
         container to an empty stack."""
+        self.REMOVED = '<removed-task>'
+        self.counter = itertools.count()
+        self.entry_finder = {}
         self.heap = []
         heapify(self.heap)
 
@@ -16,18 +20,35 @@ class LCFSFrontier(Frontier):
         """Store the given path by adding a new path to the frontier. A path is a sequence (tuple) of
         Arc objects. You should override this method. """
 
+        if path in self.entry_finder:
+            self.remove_task(path)
+
+        order = next(self.counter)
+
         sum_cost = 0
         for arc in path:
             if arc == '':
-                cost = 0
+                sum_cost += 0
             else:
-                cost = arc[3]
-            sum_cost += cost
+                sum_cost += arc[3]
 
-        heappush(self.heap, path)
+        entry = [sum_cost, order, path]
+        self.entry_finder[path] = entry
 
-        # TODO: use heap sort from heapq. pay attention to the "implementation notes" to see how you can make it stable.
-        # https://docs.python.org/3/library/heapq.html
+        # for key, value in self.entry_finder.items():
+        #     print("key is: ", key, '\nValue is: ', value)
+        #
+        # for item in self.entry_finder:
+        #     print("item ", item)
+        #
+        # print("==========")
+
+        heappush(self.heap, entry)
+
+    def remove_task(self, task):
+        'Mark an existing task as REMOVED.  Raise KeyError if not found.'
+        entry = self.entry_finder.pop(task)
+        entry[-1] = self.REMOVED
 
     def __iter__(self):
         """We don't need a separate iterator object. Just return self. You
@@ -41,7 +62,10 @@ class LCFSFrontier(Frontier):
         strategy. If there nothing to return this should raise a
         StopIteration exception."""
         if len(self.heap) > 0:
-            return heappop(self.heap)
+            cost, order, path = heappop(self.heap)
+            if path is not self.REMOVED:
+                del self.entry_finder[path]
+                return path
         else:
             raise StopIteration
 
@@ -116,6 +140,29 @@ def main():
 
     for path in frontier:
         print(path)
+
+
+    graph = LocationGraph(
+        location={'A': (25, 7),
+                  'B': (1, 7),
+                  'C': (13, 2),
+                  'D': (37, 2)},
+        radius=15,
+        starting_nodes=['B'],
+        goal_nodes={'D'}
+    )
+
+    solution = next(generic_search(graph, LCFSFrontier()))
+    print_actions(solution)
+
+    graph = ExplicitGraph(nodes=set('ABCD'),
+                          edge_list=[('A', 'D', 7), ('A', 'B', 2),
+                                     ('B', 'C', 3), ('C', 'D', 1)],
+                          starting_nodes=['A'],
+                          goal_nodes={'D'})
+
+    solution = next(generic_search(graph, LCFSFrontier()))
+    print_actions(solution)
 
 
 if __name__ == "__main__":
