@@ -39,7 +39,17 @@ class RoutingGraph(Graph):
            * To simplify textual representation, we assume that an agent is never initially at a call point.
 
           Fuel station show by F
-          * f an agent is in a cell marked as F and its current fuel amount is less than 9 it can take the action of "Fuel up" which fills the tank to its maximum capacity of 9. In the sequence of arcs, the "Fuel up" action (if available) should appear after any other directional actions. The action costs 15 units of time (regardless of how much fuel is obtained).
+          * if an agent is in a cell marked as F and its current fuel amount is less than 9
+          * it can take the action of "Fuel up" which fills the tank to its maximum capacity of 9.
+          * In the sequence of arcs, the "Fuel up" action (if available) should appear after any other directional actions.
+          * The action costs 15 units of time (regardless of how much fuel is obtained).
+
+          Portal show by P
+          * There can be zero or more portals on a map.
+          * If an agent is here, in addition to the usual movements, it has the option of teleporting to any other location on the map marked as P.
+          * In the sequence of arcs, the teleport action (if available) should appear after any other directional action.
+          * The action does not consume any fuel but costs 10 units of time (regardless of the destination).
+          * The action must be labeled as "Teleport to (row, col)" where row and col are the row and column indices of the destination portal.
           """
         self.map_str = map_str
 
