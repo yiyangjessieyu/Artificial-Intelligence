@@ -18,7 +18,7 @@ class RoutingGraph(Graph):
 
          Agents are marked by 'S' or digits 0 to 9.
           * There may be zero or more agents on the map.
-          * S agents are solar and do not need fueling.
+          * S agents are solar and do not need fueling. AKA inf
           * 0-9 Digit agents indicated by digits have fuel tanks.
               * The capacity of the tank is 9.
               * The digit shows how much fuel is initially available in the tank.
@@ -53,6 +53,8 @@ class RoutingGraph(Graph):
           """
         self.map_str = map_str
 
+        print(len(self.map_str))
+
     def starting_nodes(self):
         """Returns a sequence of starting nodes."""
         return self._starting_nodes
@@ -78,6 +80,17 @@ class RoutingGraph(Graph):
         return arcs
 
 def main():
+    map_str = """\
+    +-------+
+    |  9  XG|
+    |X XXX P|
+    | S  0FG|
+    |XX P XX|
+    +-------+
+    """
+
+    graph = RoutingGraph(map_str)
+
 
 if __name__ == "__main__":
     main()
