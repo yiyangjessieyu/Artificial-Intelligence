@@ -1,5 +1,6 @@
 import re
 
+
 def clauses(knowledge_base):
     """Takes the string of a knowledge base; returns an iterator for pairs
     of (head, body) for propositional definite clauses in the
@@ -9,11 +10,11 @@ def clauses(knowledge_base):
     -- Kourosh Neshatian - 2 Aug 2021
 
     """
-    ATOM   = r"[a-z][a-zA-Z\d_]*"
-    HEAD   = rf"\s*(?P<HEAD>{ATOM})\s*"
-    BODY   = rf"\s*(?P<BODY>{ATOM}\s*(,\s*{ATOM}\s*)*)\s*"
+    ATOM = r"[a-z][a-zA-Z\d_]*"
+    HEAD = rf"\s*(?P<HEAD>{ATOM})\s*"
+    BODY = rf"\s*(?P<BODY>{ATOM}\s*(,\s*{ATOM}\s*)*)\s*"
     CLAUSE = rf"{HEAD}(:-{BODY})?\."
-    KB     = rf"^({CLAUSE})*\s*$"
+    KB = rf"^({CLAUSE})*\s*$"
 
     assert re.match(KB, knowledge_base)
 
@@ -22,32 +23,22 @@ def clauses(knowledge_base):
 
 
 def forward_deduce(knowledge_base):
-
     kb_list = list(clauses(knowledge_base))
 
-    complete_atoms = {''}
+    complete_atoms = []
 
     more_clauses = True
-    added_to_set = False
+
     while more_clauses:
-        for pdc_tuple in kb_list:
-            head_str, body_list = pdc_tuple
-            print(head_str, body_list)
-            body_in_set = True
-            for body_str in body_list:
-                print(body_str)
-                if body_str not in complete_atoms:
-                    body_in_set = False
-
-            if body_in_set:
-                complete_atoms.add(head_str)
-                added_to_set = True
-
-        print(added_to_set)
-        if not added_to_set:
-            more_clauses = False
+        more_clauses = False # assumeno more clauses to find unless added a new atom to the set
+        for head_str, body_list in kb_list:
+            if (len(body_list) == 0 or all([body_str in complete_atoms for body_str in body_list])) and \
+                head_str not in complete_atoms:
+                complete_atoms.append(head_str)
+                more_clauses = True
 
     return complete_atoms
+
 
 def main():
     kb = """
@@ -55,11 +46,28 @@ def main():
     b.
     """
 
-    print(list(clauses(kb)))
+    print(", ".join(sorted(forward_deduce(kb))))
+
+    kb = """
+    good_programmer :- correct_code.
+    correct_code :- good_programmer.
+    """
+
+    print(", ".join(sorted(forward_deduce(kb))))
+
+    kb = """
+    a :- b, c.
+    b :- d, e.
+    b :- g, e.
+    c :- e.
+    d.
+    e.
+    f :- a,
+         g.
+    """
 
     print(", ".join(sorted(forward_deduce(kb))))
 
 
 if __name__ == "__main__":
     main()
-
