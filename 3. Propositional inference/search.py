@@ -26,14 +26,34 @@ def generic_search(graph, frontier):
         # Paths are tuples and the first arc on each path is a dummy
         # arc to a starting node
         frontier.add((Arc(None, starting_node, "no action", 0),))
+    print("=======================")
+    print("[FRONTIER from adding a body list from graph.starting_nodes()]======")
+    for arc in frontier.container:
+        print(arc)
+    print("=======================\n")
 
     for path in frontier:
+
         node_to_expand = path[-1].head  # head of the last arc in the path
+
+        print("=======================")
+        print("[path]======")
+        print(path)
+        print("[node_to_expand]======")
+        print(node_to_expand)
+        print("[graph.is_goal(node_to_expand)]======")
+        print(graph.is_goal(node_to_expand))
+
         if graph.is_goal(node_to_expand):
             yield path
 
         for arc in graph.outgoing_arcs(node_to_expand):
             frontier.add(path + (arc,))  # add back a new extended path
+
+        print("[FRONTIER from adding arcs from graph.outgoing_arcs()]======")
+        for arc in frontier.container:
+            print(arc)
+        print("=======================\n")
 
 
 class Arc(namedtuple('Arc', 'tail, head, action, cost')):

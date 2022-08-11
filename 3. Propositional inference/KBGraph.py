@@ -27,37 +27,31 @@ class KBGraph(Graph):
     def __init__(self, kb, query):
         self.clauses = list(clauses(kb))
         self.query = query
-        self.expanded_query = query # a set of atoms
+        self.expanded_query = query  # a set of atoms
 
     def starting_nodes(self):
-
-        starting_bodies = []
-
-        for head_str, body_list in self.clauses:
-            if head_str in self.query:
-                starting_bodies.append(body_list)
-
-        return starting_bodies
+        return self.query
 
     def is_goal(self, node):
         # node == [] meaning when there is no head node
         return len(node) == 0
 
     def outgoing_arcs(self, tail_node):
-        # tail node is a body
+        # tail node is the passed in node_to_expand
 
-        outgoing_arcs = set()
+        result_arcs = []
 
-        for head_str, body_list in self.clauses:
-            if tail_node == body_list:
-                self.expanded_query.remove(head_str)
-                self.expanded_query.update(body_list)
-                outgoing_arcs.update(body_list)
+        for letter in tail_node:
+            for head_str, body_list in self.clauses:
+                if head_str == letter:
+                    updated_query = set(tail_node)
+                    updated_query.remove(letter)
+                    updated_query.update(body_list)
 
-        result_arcs =[]
-
-        for letter in outgoing_arcs:
-            result_arcs.append((Arc(tail=tail_node, head=letter, action="no action", cost=0)))
+                    result_arcs.append((Arc(tail=tail_node,
+                                            head=list(updated_query),
+                                            action="no action",
+                                            cost=0)))
 
         return result_arcs
 
@@ -94,6 +88,17 @@ class DFSFrontier(Frontier):
 
 
 def main():
+    kb = """
+    a :- c, d.
+    c.
+    """
+
+    query = {'a'}
+    if next(generic_search(KBGraph(kb, query), DFSFrontier()), None):
+        print("The query is true.")
+    else:
+        print("The query is not provable. - Expected")
+
     kb = """
     a :- b, c.
     b :- d, e.
@@ -173,6 +178,7 @@ def main():
         print("The query is true.")
     else:
         print("The query is not provable. - Expected")
+
 
 if __name__ == "__main__":
     main()
