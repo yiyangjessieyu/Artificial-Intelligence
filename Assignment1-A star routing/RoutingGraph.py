@@ -1,4 +1,6 @@
 from search import *
+import math
+
 
 class RoutingGraph(Graph):
 
@@ -51,23 +53,81 @@ class RoutingGraph(Graph):
           * The action does not consume any fuel but costs 10 units of time (regardless of the destination).
           * The action must be labeled as "Teleport to (row, col)" where row and col are the row and column indices of the destination portal.
           """
-        self.map_str = map_str
 
-        print(len(self.map_str))
+        self.horizontal_length = 0
+        self.vertical_length = 0
+        horizontal_length = 0
+        vertical_length = 0
+        self.corner_str = "+"
+        self.side_str = "|"
+        self.obstacle_str = "X"
+        self.top_str = "-"
+        self.barriers = {self.corner_str, self.top_str, self.side_str, self.obstacle_str}
+
+        if self.map_str[0] == self.corner_str:
+            for char in self.map_str[1:]:
+                if char == self.corner_str:
+                    self.horizontal_length = horizontal_length
+                    break
+                else:
+                    horizontal_length += 1
+
+        for char in self.map_str[self.horizontal_length + 2:]:
+            if char == self.corner_str:
+                self.vertical_length = vertical_length / 2
+                break
+            elif char == "|":
+                vertical_length += 1
+
+        print(self.vertical_length)
+
+        location_item_dict = {}
+
+        cleaned_map_str = []
+        for row in map_str.strip().splitlines():
+            cleaned_map_str.append(list(row.strip()))
+
+        print(cleaned_map_str)
+
+        self.map_str = cleaned_map_str
+
+        self.goal_locations = {}
+        self.goal_str = "G"
+        for row_i, row_list in enumerate(self.map_str()):
+            for col_i, char in enumerate(row_list):
+                if char == self.goal_str:
+                    self.goal_locations.add((row_i, col_i))
 
     def starting_nodes(self):
-        """Returns a sequence of starting nodes."""
-        return self._starting_nodes
+        """Returns a sequence of starting nodes.
+        Represent the state of the agent by a tuple of the form (row, column, fuel)
+        """
+
+        for row_i, row_list in enumerate(self.map_str()):
+            for col_i, char in enumerate(row_list):
+                if char in range(0, 10):
+                    fuel = char
+                    yield row_i, col_i, fuel
+                elif char == 'S':
+                    fuel = math.inf
+                    yield row_i, col_i, fuel
 
     def is_goal(self, node):
         """Returns true if the given node is a goal node."""
-        return node in self.goal_nodes
+        row_i, col_i, fuel = node
+        return (row_i, col_i) in self.goal_locations
 
     def outgoing_arcs(self, node):
         """Returns a sequence of Arc objects that go out from the given
         node. The action string is automatically generated.
-
         """
+
+        # List contains tuples of directions and their actions where
+        # direction_str, vertical_change, horizontal_change = direction_action_tup
+        direction_actions = [('N', -1, 0),
+                             ('E', 0, 1),
+                             ('S', 1, 0),
+                             ('W', 0, -1)]
         arcs = []
         for edge in self.edge_list:
             if len(edge) == 2:  # if no cost is specified
@@ -78,6 +138,7 @@ class RoutingGraph(Graph):
             if tail == node:
                 arcs.append(Arc(tail, head, str(tail) + '->' + str(head), cost))
         return arcs
+
 
 def main():
     map_str = """\
