@@ -6,14 +6,22 @@ class AStarFrontier(Frontier):
     def __init__(self, map_graph):
         """The constructor takes no argument. It initialises the
         container to an empty stack."""
-        self.container = collections.deque([])
+        self.frontier = collections.deque([])
         self.map_graph = map_graph
+        self.expanded = set()
 
     def add(self, path):
         """the fontier adds the path only if it does not end with a node that is already expanded
         otherwise the path is discarded (eg. pruned)"""
-        if path not in self.container:
-            self.container.append(path)
+        node_to_expand = path[-1].head  # head of the last arc in the path
+        # print(path)
+        # print(node_to_expand)
+        # print("\n")
+        if node_to_expand not in self.expanded:
+            new_cost = 0
+            for arc in path:
+                new_cost += arc.cost
+            self.frontier.append(path)
 
     def __iter__(self):
         """We don't need a separate iterator object. Just return self. You
@@ -26,8 +34,12 @@ class AStarFrontier(Frontier):
         objects. Override this method to achieve a desired search
         strategy. If there nothing to return this should raise a
         StopIteration exception."""
-        if len(self.container) > 0:
-            return self.container.popleft()
+        if len(self.frontier) > 0:
+            front_of_queue = self.frontier.popleft()
+            node_to_expand = front_of_queue[-1].head  # head of the last arc in the path
+            if node_to_expand not in self.expanded:
+                self.expanded.add(node_to_expand)
+                return front_of_queue
         else:
             raise StopIteration
 

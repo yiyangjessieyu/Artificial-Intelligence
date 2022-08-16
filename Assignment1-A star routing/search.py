@@ -19,13 +19,16 @@ def generic_search(graph, frontier):
     """Implements a generic graph search algorithm (see the lecture
     notes). The actual search behaviour depends on the type of the
     frontier object.
-
     """
 
     for starting_node in graph.starting_nodes():
         # Paths are tuples and the first arc on each path is a dummy
         # arc to a starting node
         frontier.add((Arc(None, starting_node, "no action", 0),))
+
+    for item in frontier:
+        print(item)
+        print("\n")
 
     for path in frontier:
         node_to_expand = path[-1].head  # head of the last arc in the path
