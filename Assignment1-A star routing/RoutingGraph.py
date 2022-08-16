@@ -1,6 +1,35 @@
+import collections
 from search import *
 import math
 
+class AStarFrontier(Frontier):
+    def __init__(self, map_graph):
+        """The constructor takes no argument. It initialises the
+        container to an empty stack."""
+        self.container = collections.deque([])
+        self.map_graph = map_graph
+
+    def add(self, path):
+        """the fontier adds the path only if it does not end with a node that is already expanded
+        otherwise the path is discarded (eg. pruned)"""
+        if path not in self.container:
+            self.container.append(path)
+
+    def __iter__(self):
+        """We don't need a separate iterator object. Just return self. You
+        don't need to change this method."""
+        return self
+
+    def __next__(self):
+        """Selects, removes, and returns a path on the frontier if there is
+        any. Recall that a path is a sequence (tuple) of Arc
+        objects. Override this method to achieve a desired search
+        strategy. If there nothing to return this should raise a
+        StopIteration exception."""
+        if len(self.container) > 0:
+            return self.container.popleft()
+        else:
+            raise StopIteration
 
 class RoutingGraph(Graph):
 
@@ -38,6 +67,9 @@ class RoutingGraph(Graph):
         self.agent_fuel_str_options = set('S')
         for num in range(0, 10):  # The capacity of the fuel tank is 9.
             self.agent_fuel_str_options.add(str(num))
+
+    def estimated_cost_to_goal(self, node):
+        return 0
 
     def starting_nodes(self):
         """Returns a sequence of starting nodes.
@@ -111,110 +143,116 @@ class RoutingGraph(Graph):
 def main():
     map_str = """\
     +-------+
-    |  9  XG|
-    |X XXX P|
-    | S  0FG|
-    |XX P XX|
+    |   G   |
+    |       |
+    |   S   |
     +-------+
     """
 
-    graph = RoutingGraph(map_str)
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
-    print("Starting nodes:", sorted(graph.starting_nodes()))
-    print("Outgoing arcs (available actions) at starting states:")
-    for s in sorted(graph.starting_nodes()):
-        print(s)
-        for arc in graph.outgoing_arcs(s):
-            print("  " + str(arc))
+    map_str = """\
+    +-------+
+    |  GG   |
+    |S    G |
+    |  S    |
+    +-------+
+    """
 
-    node = (1, 1, 5)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
-    print("Outgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
-    node = (1, 7, 2)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
-    print("Outgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
+    map_str = """\
+    +-------+
+    |     XG|
+    |X XXX  |
+    | S     |
+    +-------+
+    """
 
-    node = (3, 7, 0)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
-    node = (3, 7, math.inf)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    map_str = """\
+    +-------+
+    |  F  X |
+    |X XXXXG|
+    | 3     |
+    +-------+
+    """
 
-    node = (3, 6, 5)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
-    print("Outgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
-
-    node = (3, 6, 9)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
-    print("Outgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
-
-    node = (2, 7, 4)  # at a location with a portal
-    print("\nOutgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
     map_str = """\
     +--+
     |GS|
     +--+
     """
-
-    graph = RoutingGraph(map_str)
-
-    print("Starting nodes:", sorted(graph.starting_nodes()))
-    print("Outgoing arcs (available actions) at the start:")
-    for start in graph.starting_nodes():
-        for arc in graph.outgoing_arcs(start):
-            print("  " + str(arc))
-
-    node = (1, 1, 1)
-    print("\nIs {} goal?".format(node), graph.is_goal(node))
-    print("Outgoing arcs (available actions) at {}:".format(node))
-    for arc in graph.outgoing_arcs(node):
-        print("  " + str(arc))
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
     map_str = """\
-    +------+
-    |S    S|
-    |  GXXX|
-    |S     |
-    +------+
+    +---+
+    |GF2|
+    +---+
+    """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
+
+    map_str = """\
+    +----+
+    | S  |
+    | SX |
+    |GX G|
+    +----+
     """
 
-    graph = RoutingGraph(map_str)
-    print("Starting nodes:", sorted(graph.starting_nodes()))
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
 
     map_str = """\
-        +----+
-        | X  |
-        |XSX |
-        | X G|
-        +----+
+    +---------+
+    |         |
+    |    G    |
+    |         |
+    +---------+
+    """
+
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
+
+    map_str = """\
+        +----------+
+        |    X     |
+        | S  X  G  |
+        |    X     |
+        +----------+
         """
-
-    graph = RoutingGraph(map_str)
-
-    print("Starting nodes:", sorted(graph.starting_nodes()))
-    print("Available actions at the start:")
-    for s in graph.starting_nodes():
-        for arc in graph.outgoing_arcs(s):
-            print("  " + arc.action)
-
-    #### Expected
-    ###############################################
-    """
-    Starting nodes: [(2, 2, inf)]
-    Available actions at the start:
-    """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_actions(solution)
+    '''
+    There is no solution!
+    '''
 
 
 if __name__ == "__main__":
