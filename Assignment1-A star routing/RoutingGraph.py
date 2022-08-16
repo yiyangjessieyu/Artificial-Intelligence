@@ -7,110 +7,55 @@ class RoutingGraph(Graph):
     def __init__(self, map_str):
         """
         :param map_str: The map is always rectangular.
-
         Positions in the map by a pair (row, col).
-         * Row numbers start from 0 for the first (topmost) line, 1 for the second line, and so on.
-         * Col start from 0 for the first (leftmost) position (character) in the line.
+            * Row numbers start from 0 for the first (topmost) line, 1 for the second line, and so on.
+            * Col start from 0 for the first (leftmost) position (character) in the line.
+        """
 
-        The environment is surrounded by walls marked by '+' or '-' or '|' character.
-         * Position (0,0) is a '+' (i.e. wall) and so are all other three corners of the map.
-         * First and last rows and columns are '-' and '|' respectively (except for the corners).
-
-         The obstacles are marked by 'X'
-
-         Agents are marked by 'S' or digits 0 to 9.
-          * There may be zero or more agents on the map.
-          * S agents are solar and do not need fueling. AKA inf
-          * 0-9 Digit agents indicated by digits have fuel tanks.
-              * The capacity of the tank is 9.
-              * The digit shows how much fuel is initially available in the tank.
-
-         Agent Actions
-          * Can move in four directions, N, E, S, W, as long as it has fuel and there is no obstacle or wall in the way.
-          * This means that agents can also go to cells where other agents are present.
-          * The agent loses one unit of fuel for each move.
-          * The order of actions is clockwise starting from N. So N, E, S, W
-            * eg, if from a position all four directional moves are possible,
-            * then the first arc in the sequence of arcs returned by outgoing_arcs is for going north,
-            * then east, and so on.
-          * All single directional moves take 5 units of time.
-          * This is what we regard as the cost of the action (since the objective of the problem is to minimise the service time).
-
-          Call points / customers are potential destination marked by G
-           * There may be zero or more call points (customers) on the map.
-           * To simplify textual representation, we assume that an agent is never initially at a call point.
-
-          Fuel station show by F
-          * if an agent is in a cell marked as F and its current fuel amount is less than 9
-          * it can take the action of "Fuel up" which fills the tank to its maximum capacity of 9.
-          * In the sequence of arcs, the "Fuel up" action (if available) should appear after any other directional actions.
-          * The action costs 15 units of time (regardless of how much fuel is obtained).
-
-          Portal show by P
-          * There can be zero or more portals on a map.
-          * If an agent is here, in addition to the usual movements, it has the option of teleporting to any other location on the map marked as P.
-          * In the sequence of arcs, the teleport action (if available) should appear after any other directional action.
-          * The action does not consume any fuel but costs 10 units of time (regardless of the destination).
-          * The action must be labeled as "Teleport to (row, col)" where row and col are the row and column indices of the destination portal.
-          """
-
-        self.horizontal_length = 0
-        self.vertical_length = 0
-        horizontal_length = 0
-        vertical_length = 0
+        # The environment is surrounded by walls marked by '+' or '-' or '|' character.
         self.corner_str = "+"
         self.side_str = "|"
-        self.obstacle_str = "X"
         self.top_str = "-"
+        self.obstacle_str = "X"  # The obstacles are marked by 'X'
         self.barriers = {self.corner_str, self.top_str, self.side_str, self.obstacle_str}
 
-        if self.map_str[0] == self.corner_str:
-            for char in self.map_str[1:]:
-                if char == self.corner_str:
-                    self.horizontal_length = horizontal_length
-                    break
-                else:
-                    horizontal_length += 1
-
-        for char in self.map_str[self.horizontal_length + 2:]:
-            if char == self.corner_str:
-                self.vertical_length = vertical_length / 2
-                break
-            elif char == "|":
-                vertical_length += 1
-
-        print(self.vertical_length)
-
-        location_item_dict = {}
-
-        cleaned_map_str = []
+        self.map_str = []
         for row in map_str.strip().splitlines():
-            cleaned_map_str.append(list(row.strip()))
+            self.map_str.append(list(row.strip()))
 
-        print(cleaned_map_str)
-
-        self.map_str = cleaned_map_str
-
-        self.goal_locations = {}
+        self.goal_locations = set()  # Call points / customers are potential destination marked by G
+        self.portal_locations = set()
         self.goal_str = "G"
-        for row_i, row_list in enumerate(self.map_str()):
+        self.portal_str = "P"
+        for row_i, row_list in enumerate(self.map_str):
             for col_i, char in enumerate(row_list):
                 if char == self.goal_str:
                     self.goal_locations.add((row_i, col_i))
+                elif char == self.portal_str:
+                    self.portal_locations.add((row_i, col_i))
+
+        # Agents are marked by 'S' or digits 0 to 9.
+        self.agent_fuel_str_options = set('S')
+        for num in range(0, 10):  # The capacity of the fuel tank is 9.
+            self.agent_fuel_str_options.add(str(num))
 
     def starting_nodes(self):
         """Returns a sequence of starting nodes.
         Represent the state of the agent by a tuple of the form (row, column, fuel)
         """
 
-        for row_i, row_list in enumerate(self.map_str()):
+        starting_agents = []
+
+        for row_i, row_list in enumerate(self.map_str):
             for col_i, char in enumerate(row_list):
-                if char in range(0, 10):
-                    fuel = char
-                    yield row_i, col_i, fuel
-                elif char == 'S':
-                    fuel = math.inf
-                    yield row_i, col_i, fuel
+                if char == 'S':
+                    fuel = math.inf  # S agents are solar and do not need fueling. AKA inf
+                    starting_agents.append((row_i, col_i, fuel))
+                elif char in self.agent_fuel_str_options:
+                    fuel = int(char)
+                    starting_agents.append((row_i, col_i, fuel))
+
+        return starting_agents
 
     def is_goal(self, node):
         """Returns true if the given node is a goal node."""
@@ -120,23 +65,46 @@ class RoutingGraph(Graph):
     def outgoing_arcs(self, node):
         """Returns a sequence of Arc objects that go out from the given
         node. The action string is automatically generated.
+        Agent Actions
+          * Can move in four directions, N, E, S, W, as long as it has fuel and there is no obstacle or wall in the way.
+          * This means that agents can also go to cells where other agents are present.
         """
 
         # List contains tuples of directions and their actions where
-        # direction_str, vertical_change, horizontal_change = direction_action_tup
+        # direction_str, row_change, col_change = direction_action_tup
         direction_actions = [('N', -1, 0),
                              ('E', 0, 1),
                              ('S', 1, 0),
                              ('W', 0, -1)]
         arcs = []
-        for edge in self.edge_list:
-            if len(edge) == 2:  # if no cost is specified
-                tail, head = edge
-                cost = 1  # assume unit cost
-            else:
-                tail, head, cost = edge
-            if tail == node:
-                arcs.append(Arc(tail, head, str(tail) + '->' + str(head), cost))
+
+        agent_row, agent_col, agent_fuel = node
+
+        for direction_str, row_change, col_change in direction_actions:
+            new_row = agent_row + row_change
+            new_col = agent_col + col_change
+            new_value = self.map_str[new_row][new_col]
+            if new_value not in self.barriers and agent_fuel > 0:
+                arcs.append((Arc(tail=node,
+                                 head=(new_row, new_col, agent_fuel - 1),  # The agent loses one unit of fuel
+                                 action=direction_str,  # for directions action
+                                 cost=5)))  # All single directional moves take 5 units of time.
+
+        curr_value = self.map_str[agent_row][agent_col]
+        if curr_value == "F" and agent_fuel < 9:  # Fuel station
+            arcs.append((Arc(tail=node,
+                             head=(agent_row, agent_col, 9),  # Fuel up to max capacity of 9.
+                             action="Fuel up",  # for fueling action
+                             cost=15)))  # 15 units of time (regardless of how much fuel is obtained).
+
+        if curr_value == "P":  # Portal station
+            for portal_row, portal_col in self.portal_locations:
+                if (portal_row, portal_col) != (agent_row, agent_col):
+                    arcs.append((Arc(tail=node,
+                                     head=(portal_row, portal_col, agent_fuel),  # does not consume any fuel
+                                     action="Teleport to " + str((portal_row, portal_col)),  # row and col of the destination portal
+                                     cost=10)))  # The action costs 10 units of time (regardless of the destination).
+
         return arcs
 
 
@@ -151,6 +119,102 @@ def main():
     """
 
     graph = RoutingGraph(map_str)
+
+    print("Starting nodes:", sorted(graph.starting_nodes()))
+    print("Outgoing arcs (available actions) at starting states:")
+    for s in sorted(graph.starting_nodes()):
+        print(s)
+        for arc in graph.outgoing_arcs(s):
+            print("  " + str(arc))
+
+    node = (1, 1, 5)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    print("Outgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    node = (1, 7, 2)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    print("Outgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    node = (3, 7, 0)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+
+    node = (3, 7, math.inf)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+
+    node = (3, 6, 5)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    print("Outgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    node = (3, 6, 9)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    print("Outgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    node = (2, 7, 4)  # at a location with a portal
+    print("\nOutgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    map_str = """\
+    +--+
+    |GS|
+    +--+
+    """
+
+    graph = RoutingGraph(map_str)
+
+    print("Starting nodes:", sorted(graph.starting_nodes()))
+    print("Outgoing arcs (available actions) at the start:")
+    for start in graph.starting_nodes():
+        for arc in graph.outgoing_arcs(start):
+            print("  " + str(arc))
+
+    node = (1, 1, 1)
+    print("\nIs {} goal?".format(node), graph.is_goal(node))
+    print("Outgoing arcs (available actions) at {}:".format(node))
+    for arc in graph.outgoing_arcs(node):
+        print("  " + str(arc))
+
+    map_str = """\
+    +------+
+    |S    S|
+    |  GXXX|
+    |S     |
+    +------+
+    """
+
+    graph = RoutingGraph(map_str)
+    print("Starting nodes:", sorted(graph.starting_nodes()))
+
+    map_str = """\
+        +----+
+        | X  |
+        |XSX |
+        | X G|
+        +----+
+        """
+
+    graph = RoutingGraph(map_str)
+
+    print("Starting nodes:", sorted(graph.starting_nodes()))
+    print("Available actions at the start:")
+    for s in graph.starting_nodes():
+        for arc in graph.outgoing_arcs(s):
+            print("  " + arc.action)
+
+    #### Expected
+    ###############################################
+    """
+    Starting nodes: [(2, 2, inf)]
+    Available actions at the start:
+    """
 
 
 if __name__ == "__main__":
