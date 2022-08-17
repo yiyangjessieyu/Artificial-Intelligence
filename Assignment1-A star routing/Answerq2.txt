@@ -1,0 +1,150 @@
+Actions:
+  N,
+  N.
+Total cost: 10
+Actions:
+  N,
+  N.
+Total cost: 10
+Actions:
+  E,
+  E,
+  E,
+  E,
+  N,
+  E,
+  N.
+Total cost: 35
+Actions:
+  N,
+  N,
+  E,
+  Fuel up,
+  W,
+  S,
+  S,
+  E,
+  E,
+  E,
+  E,
+  E,
+  N.
+Total cost: 75
+Actions:
+  W.
+Total cost: 5
+Actions:
+  W,
+  W.
+Total cost: 10
+Actions:
+  W,
+  S.
+Total cost: 10
+There is no solution!
+There is no solution!
+Actions:
+  S,
+  E,
+  E,
+  Fuel up,
+  E,
+  E,
+  E,
+  E,
+  E,
+  E,
+  E,
+  E,
+  S,
+  Fuel up,
+  N,
+  E,
+  E,
+  E,
+  E,
+  E,
+  N,
+  N,
+  N,
+  Fuel up,
+  S,
+  W,
+  W,
+  W,
+  W,
+  W,
+  W,
+  W,
+  W.
+Total cost: 195
+Actions:
+  N,
+  N.
+Total cost: 10
+Actions:
+  N,
+  N.
+Total cost: 10
+Actions:
+  E,
+  E,
+  E,
+  E,
+  N,
+  E,
+  N.
+Total cost: 35
+Actions:
+  N,
+  N,
+  E,
+  Fuel up,
+  W,
+  S,
+  S,
+  E,
+  E,
+  E,
+  E,
+  E,
+  N.
+Total cost: 75
+Actions:
+  W.
+Total cost: 5
+Actions:
+  W,
+  W.
+Total cost: 10
+Actions:
+  W,
+  S.
+Total cost: 10
+There is no solution!
+Actions:
+  E,
+  E,
+  E,
+  N,
+  Teleport to (4, 1),
+  E,
+  E,
+  Fuel up,
+  W,
+  W,
+  Teleport to (1, 5),
+  E,
+  E,
+  E,
+  S,
+  S,
+  S.
+Total cost: 105
+There is no solution!
+Actions:
+  N,
+  N,
+  N,
+  N.
+Total cost: 20

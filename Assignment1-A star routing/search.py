@@ -25,12 +25,12 @@ def generic_search(graph, frontier):
         # Paths are tuples and the first arc on each path is a dummy
         # arc to a starting node
         frontier.add((Arc(None, starting_node, "no action", 0),))
-
-    for item in frontier:
-        print(item)
-        print("\n")
+    #
+    # print("Starting nodes:", sorted(graph.starting_nodes()))
+    # print("Outgoing arcs (available actions) at starting states:")
 
     for path in frontier:
+        # print("next path is: " + str(path))
         node_to_expand = path[-1].head  # head of the last arc in the path
 
         if graph.is_goal(node_to_expand):
@@ -38,6 +38,11 @@ def generic_search(graph, frontier):
 
         for arc in graph.outgoing_arcs(node_to_expand):
             frontier.add(path + (arc,))  # add back a new extended path
+            #print("  " + str(arc))
+
+        # print("expanded is:")
+        # print("  " + str(frontier.expanded))
+
 
 
 class Arc(namedtuple('Arc', 'tail, head, action, cost')):
