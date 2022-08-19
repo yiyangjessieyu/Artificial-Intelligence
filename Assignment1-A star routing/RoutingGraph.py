@@ -3,9 +3,6 @@ from search import *
 import math
 
 
-def print_map(map_graph, frontier, solution):
-
-
 class AStarFrontier(Frontier):
     def __init__(self, map_graph):
         self.collection = []
@@ -158,134 +155,320 @@ class RoutingGraph(Graph):
         return arcs
 
 
+def print_map(map_graph, frontier, solution):
+    print("WIP")
+
 def main():
-    map_str = """\
-    +-------+
-    |   G   |
-    |       |
-    |   S   |
-    +-------+
-    """
+    Q3test()
 
+def Q3test():
+    map_str = """\
+        +----------------+
+        |                |
+        |                |
+        |                |
+        |                |
+        |                |
+        |                |
+        |        S       |
+        |                |
+        |                |
+        |     G          |
+        |                |
+        |                |
+        |                |
+        +----------------+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    print(solution)
+    print_map(map_graph, frontier, solution)
+    '''
+    +----------------+
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |     ...S       |
+    |     ...*       |
+    |     ...*       |
+    |     G***       |
+    |                |
+    |                |
+    |                |
+    +----------------+
+    '''
 
     map_str = """\
-    +-------+
-    |  GG   |
-    |S    G |
-    |  S    |
-    +-------+
-    """
+        +----------------+
+        |                |
+        |                |
+        |                |
+        |                |
+        |                |
+        |                |
+        |        S       |
+        |                |
+        |                |
+        |     G          |
+        |                |
+        |                |
+        |                |
+        +----------------+
+        """
+    map_graph = RoutingGraph(map_str)
+    # changing the heuristic so the search behaves like LCFS
+    map_graph.estimated_cost_to_goal = lambda node: 0
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
+    +----------------+
+    |        .       |
+    |       ...      |
+    |      .....     |
+    |     .......    |
+    |    .........   |
+    |   ...........  |
+    |   .....S...... |
+    |    ....*.....  |
+    |     ...*....   |
+    |     G***...    |
+    |      .....     |
+    |       ...      |
+    |        .       |
+    +----------------+
+    '''
 
+    map_str = """\
+        +-------------+
+        | G         G |
+        |      S      |
+        | G         G |
+        +-------------+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    print_map(map_graph, frontier, solution)
+    '''
+    +-------------+
+    | G....*****G |
+    | .....S..... |
+    | G.........G |
+    +-------------+
+    '''
 
     map_str = """\
+        +-------+
+        |     XG|
+        |X XXX  |
+        |  S    |
+        +-------+
+        """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
     +-------+
     |     XG|
-    |X XXX  |
-    | S     |
+    |X XXX**|
+    |  S***.|
     +-------+
-    """
+    '''
 
+    map_str = """\
+        +--+
+        |GS|
+        +--+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
-
-    map_str = """\
-    +-------+
-    |  F  X |
-    |X XXXXG|
-    | 3     |
-    +-------+
-    """
-
-    map_graph = RoutingGraph(map_str)
-    frontier = AStarFrontier(map_graph)
-    solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
-
-    map_str = """\
+    print_map(map_graph, frontier, solution)
+    '''
     +--+
     |GS|
     +--+
-    """
+    '''
+
+    map_str = """\
+        +----+
+        |    |
+        | SX |
+        | X G|
+        +----+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
-
-    map_str = """\
-    +---+
-    |GF2|
-    +---+
-    """
-    map_graph = RoutingGraph(map_str)
-    frontier = AStarFrontier(map_graph)
-    solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
-
-    map_str = """\
+    print_map(map_graph, frontier, solution)
+    '''
     +----+
-    | S  |
-    | SX |
-    |GX G|
+    | ***|
+    |.SX*|
+    |.X G|
     +----+
-    """
+    '''
 
+    map_str = """\
+        +---------------+
+        |    G          |
+        |XXXXXXXXXXXX   |
+        |           X   |
+        |  XXXXXX   X   |
+        |  X S  X   X   |
+        |  X        X   |
+        |  XXXXXXXXXX   |
+        |               |
+        +---------------+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    print_map(map_graph, frontier, solution)
+    '''
+    +---------------+
+    |    G********  |
+    |XXXXXXXXXXXX*  |
+    |.********..X*  |
+    |.*XXXXXX*..X*  |
+    |.*X.S**X*..X*  |
+    |.*X...***..X*  |
+    |.*XXXXXXXXXX*  |
+    |.************  |
+    +---------------+
+    '''
 
     map_str = """\
+        +------------+
+        |         X  |
+        | S       X G|
+        |         X  |
+        |         X  |
+        |         X  |
+        +------------+
+        """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
+    +------------+
+    |.........X  |
+    |.S.......X G|
+    |.........X  |
+    |.........X  |
+    |.........X  |
+    +------------+
+    '''
+
+    map_str = """\
+        +---------+
+        |         |
+        |    G    |
+        |         |
+        +---------+
+        """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
     +---------+
     |         |
     |    G    |
     |         |
     +---------+
-    """
-
-    map_graph = RoutingGraph(map_str)
-    frontier = AStarFrontier(map_graph)
-    solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    '''
 
     map_str = """\
-        +----------+
-        |    X     |
-        | S  X  G  |
-        |    X     |
-        +----------+
+        +-------------+
+        |         G   |
+        | S           |
+        |         S   |
+        +-------------+
         """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    print_map(map_graph, frontier, solution)
     '''
-    There is no solution!
+    +-------------+
+    |         G   |
+    | S       *   |
+    |         S   |
+    +-------------+
     '''
-    map_str = """\
-    +----------------+
-    |2              F|
-    |XX     G 123    |
-    |3XXXXXXXXXXXXXX |
-    |  F             |
-    |          F     |
-    +----------------+
-    """
 
+    map_str = """\
+        +------+
+        |      |
+        |S X   |
+        |XXXXX |
+        |G X   |
+        |      |
+        +------+
+        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print_actions(solution)
+    print_map(map_graph, frontier, solution)
+    '''
+    +------+
+    |****..|
+    |S.X***|
+    |XXXXX*|
+    |G*X***|
+    |.***..|
+    +------+
+    '''
 
+    map_str = """\
+        +-------------+
+        |S            |
+        |             |
+        |   G      S  |
+        |             |
+        | G           |
+        +-------------+
+        """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
+    +-------------+
+    |S***         |
+    |...*         |
+    |...G      S  |
+    |..           |
+    |.G           |
+    +-------------+
+    '''
+
+    map_str = """\
+        +-------------+
+        |    XG       |
+        |    XXXXX  X |
+        |S        X   |
+        +-------------+
+        """
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+    '''
+    +-------------+
+    |....XG       |
+    |....XXXXX  X |
+    |S........X   |
+    +-------------+
+    '''
 
 if __name__ == "__main__":
     main()
