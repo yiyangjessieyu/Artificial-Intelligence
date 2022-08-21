@@ -83,15 +83,15 @@ class RoutingGraph(Graph):
         meets the required criteria for heuristics."""
         agent_row, agent_col, agent_fuel = node
 
-        heuristic = math.inf
+        heuristic = float(math.inf)
         for goal_row, goal_col in self.goal_locations:
             h_row = abs(agent_row - goal_row)
             h_col = abs(agent_col - goal_col)
             new_heuristic = h_row + h_col
+           # hypotenuse = float(math.sqrt(h_row ** 2 + h_col ** 2))
             if new_heuristic < heuristic:
                 heuristic = new_heuristic
-
-        return heuristic
+        return heuristic * 5
 
     def starting_nodes(self):
         """Returns a sequence of starting nodes.
@@ -206,29 +206,6 @@ def Q3test():
     |                |
     +----------------+
     """
-
-    map_graph = RoutingGraph(map_str)
-    frontier = AStarFrontier(map_graph)
-    solution = next(generic_search(map_graph, frontier), None)
-    print_map(map_graph, frontier, solution)
-
-    map_str = """\
-        +----------------+
-        |                |
-        |                |
-        |                |
-        |                |
-        |                |
-        |                |
-        |        S       |
-        |                |
-        |                |
-        |     G          |
-        |                |
-        |                |
-        |                |
-        +----------------+
-        """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -252,22 +229,22 @@ def Q3test():
     '''
 
     map_str = """\
-        +----------------+
-        |                |
-        |                |
-        |                |
-        |                |
-        |                |
-        |                |
-        |        S       |
-        |                |
-        |                |
-        |     G          |
-        |                |
-        |                |
-        |                |
-        +----------------+
-        """
+    +----------------+
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |        S       |
+    |                |
+    |                |
+    |     G          |
+    |                |
+    |                |
+    |                |
+    +----------------+
+    """
     map_graph = RoutingGraph(map_str)
     # changing the heuristic so the search behaves like LCFS
     map_graph.estimated_cost_to_goal = lambda node: 0
@@ -293,12 +270,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +-------------+
-        | G         G |
-        |      S      |
-        | G         G |
-        +-------------+
-        """
+    +-------------+
+    | G         G |
+    |      S      |
+    | G         G |
+    +-------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -312,12 +289,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +-------+
-        |     XG|
-        |X XXX  |
-        |  S    |
-        +-------+
-        """
+    +-------+
+    |     XG|
+    |X XXX  |
+    |  S    |
+    +-------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -331,10 +308,10 @@ def Q3test():
     '''
 
     map_str = """\
-        +--+
-        |GS|
-        +--+
-        """
+    +--+
+    |GS|
+    +--+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -346,12 +323,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +----+
-        |    |
-        | SX |
-        | X G|
-        +----+
-        """
+    +----+
+    |    |
+    | SX |
+    | X G|
+    +----+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -365,17 +342,17 @@ def Q3test():
     '''
 
     map_str = """\
-        +---------------+
-        |    G          |
-        |XXXXXXXXXXXX   |
-        |           X   |
-        |  XXXXXX   X   |
-        |  X S  X   X   |
-        |  X        X   |
-        |  XXXXXXXXXX   |
-        |               |
-        +---------------+
-        """
+    +---------------+
+    |    G          |
+    |XXXXXXXXXXXX   |
+    |           X   |
+    |  XXXXXX   X   |
+    |  X S  X   X   |
+    |  X        X   |
+    |  XXXXXXXXXX   |
+    |               |
+    +---------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -394,14 +371,14 @@ def Q3test():
     '''
 
     map_str = """\
-        +------------+
-        |         X  |
-        | S       X G|
-        |         X  |
-        |         X  |
-        |         X  |
-        +------------+
-        """
+    +------------+
+    |         X  |
+    | S       X G|
+    |         X  |
+    |         X  |
+    |         X  |
+    +------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -417,12 +394,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +---------+
-        |         |
-        |    G    |
-        |         |
-        +---------+
-        """
+    +---------+
+    |         |
+    |    G    |
+    |         |
+    +---------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -436,12 +413,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +-------------+
-        |         G   |
-        | S           |
-        |         S   |
-        +-------------+
-        """
+    +-------------+
+    |         G   |
+    | S           |
+    |         S   |
+    +-------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -455,14 +432,14 @@ def Q3test():
     '''
 
     map_str = """\
-        +------+
-        |      |
-        |S X   |
-        |XXXXX |
-        |G X   |
-        |      |
-        +------+
-        """
+    +------+
+    |      |
+    |S X   |
+    |XXXXX |
+    |G X   |
+    |      |
+    +------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -478,14 +455,14 @@ def Q3test():
     '''
 
     map_str = """\
-        +-------------+
-        |S            |
-        |             |
-        |   G      S  |
-        |             |
-        | G           |
-        +-------------+
-        """
+    +-------------+
+    |S            |
+    |             |
+    |   G      S  |
+    |             |
+    | G           |
+    +-------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
@@ -501,12 +478,12 @@ def Q3test():
     '''
 
     map_str = """\
-        +-------------+
-        |    XG       |
-        |    XXXXX  X |
-        |S        X   |
-        +-------------+
-        """
+    +-------------+
+    |    XG       |
+    |    XXXXX  X |
+    |S        X   |
+    +-------------+
+    """
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
