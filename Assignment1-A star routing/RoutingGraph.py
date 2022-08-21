@@ -13,15 +13,12 @@ class AStarFrontier(Frontier):
     def add(self, path):
         """the fontier adds the path only if it does not end with a node that is already expanded
         otherwise the path is discarded (eg. pruned)."""
-        cost_sum = 0
-        for arc in path:
-            cost_sum += arc.cost
-
         node_to_expand = path[-1].head  # head of the last arc in the path
         if node_to_expand not in self.expanded:
-            self.count += 1
+            cost_sum = sum(arc.cost for arc in path) + self.map_graph.estimated_cost_to_goal(node_to_expand)
             heapq.heappush(self.collection,
                            (cost_sum, self.count, path))
+            self.count += 1
 
     def __iter__(self):
         return self
@@ -32,19 +29,14 @@ class AStarFrontier(Frontier):
         objects. Override this method to achieve a desired search
         strategy. If there nothing to return this should raise a
         StopIteration exception."""
-        heapq.heapify(self.collection)
-        next_found = False
-
-        while not next_found:
-
-            if len(self.collection) > 0:
-                count, cost, path = heapq.heappop(self.collection)
-                node_to_expand = path[-1].head  # head of the last arc in the path
-                if node_to_expand not in self.expanded:
-                    self.expanded.add(node_to_expand)
-                    return path
-            else:
-                raise StopIteration
+        while len(self.collection) > 0:
+            count, cost, path = heapq.heappop(self.collection)
+            node_to_expand = path[-1].head  # head of the last arc in the path
+            if node_to_expand not in self.expanded:
+                self.expanded.add(node_to_expand)
+                return path
+        else:
+            raise StopIteration
 
 class RoutingGraph(Graph):
 
@@ -84,7 +76,22 @@ class RoutingGraph(Graph):
             self.agent_fuel_str_options.add(str(num))
 
     def estimated_cost_to_goal(self, node):
-        return 0
+        """Return the estimated cost to a goal node from the given
+        state. This function is usually implemented when there is a
+        single goal state. The function is used as a heuristic in
+        search. The implementation should make sure that the heuristic
+        meets the required criteria for heuristics."""
+        agent_row, agent_col, agent_fuel = node
+
+        heuristic = math.inf
+        for goal_row, goal_col in self.goal_locations:
+            h_row = abs(agent_row - goal_row)
+            h_col = abs(agent_col - goal_col)
+            new_heuristic = h_row + h_col
+            if new_heuristic < heuristic:
+                heuristic = new_heuristic
+
+        return heuristic
 
     def starting_nodes(self):
         """Returns a sequence of starting nodes.
@@ -154,14 +161,57 @@ class RoutingGraph(Graph):
 
         return arcs
 
-
 def print_map(map_graph, frontier, solution):
-    print("WIP")
+    """
+    :param map_graph:
+    :param frontier:
+    :param solution: Arc objects that make up a path from a starting node to a goal node, or is None.
+    :return:
+    """
+
+    expanded = frontier.expanded
+    map_list = map_graph.map_str[:]
+
+    if len(expanded) > 0:
+        for row, col, fuel in expanded:
+            if map_list[row][col] != "G" and map_list[row][col] != "S":
+                map_list[row][col] = '.'
+
+    if solution:
+        for arc in solution[1:-1]:
+            row, col, fuel = arc.head
+            map_list[row][col] = '*'
+
+    for row in map_list:
+        print("".join(row))
 
 def main():
     Q3test()
 
 def Q3test():
+    map_str = """\
+    +----------------+
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |                |
+    |        S       |
+    |                |
+    |                |
+    |     G          |
+    |                |
+    |                |
+    |                |
+    +----------------+
+    """
+
+    map_graph = RoutingGraph(map_str)
+    frontier = AStarFrontier(map_graph)
+    solution = next(generic_search(map_graph, frontier), None)
+    print_map(map_graph, frontier, solution)
+
     map_str = """\
         +----------------+
         |                |
@@ -182,7 +232,6 @@ def Q3test():
     map_graph = RoutingGraph(map_str)
     frontier = AStarFrontier(map_graph)
     solution = next(generic_search(map_graph, frontier), None)
-    print(solution)
     print_map(map_graph, frontier, solution)
     '''
     +----------------+
