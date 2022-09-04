@@ -1,5 +1,6 @@
 from csp import *
-import itertools
+import itertools, copy
+
 
 def generate_and_test(csp):
     names, domains = zip(*csp.var_domains.items())
@@ -8,8 +9,62 @@ def generate_and_test(csp):
         if all(satisfies(assignment, constraints) for constraints in csp.constraints):
             yield assignment
 
+
+
+
+
+def arc_consistent(csp):
+    csp = copy.deepcopy(csp)
+
+    # every constraint is paired with a variable in the domain
+    to_do = {(x, c) for c in csp.constraints for x in csp.var_domains}
+
+    while to_do:
+        x, c = to_do.pop()
+        # x is the variable, c is th constraint
+
+        ys = scope(c) - {x}
+        new_domain = set()
+        for xval in csp.var_domains[x]:  # COMPLETE
+            assignment = {x: xval}
+            for yvals in itertools.product(*[csp.var_domains[y] for y in ys]):
+                assignment.update({y: yval for y, yval in zip(ys, yvals)})
+                if satisfies(assignment, c):  # COMPLETE
+                    new_domain.add(xval)  # COMPLETE
+                    break
+
+        if csp.var_domains[x] != new_domain:
+            for cprime in set(csp.constraints) - {c}:
+                if x in scope(cprime):
+                    for z in scope(cprime):  # COMPLETE
+                        if x != z:  # COMPLETE
+                            to_do.add((z, cprime))
+            csp.var_domains[x] = new_domain  # COMPLETE
+    return csp
+
+
 def main():
-    Q3test()
+    Q4test()
+
+
+def Q4test():
+    simple_csp = CSP(
+        var_domains={x: set(range(1, 5)) for x in 'abc'},
+        constraints={
+            lambda a, b: a < b,
+            lambda b, c: b < c,
+        })
+
+    csp = arc_consistent(simple_csp)
+    for var in sorted(csp.var_domains.keys()):
+        print("{}: {}".format(var, sorted(csp.var_domains[var])))
+
+    csp = CSP(var_domains={x: set(range(10)) for x in 'abc'},
+              constraints={lambda a, b, c: 2 * a + b + 2 * c == 10})
+
+    csp = arc_consistent(csp)
+    for var in sorted(csp.var_domains.keys()):
+        print("{}: {}".format(var, sorted(csp.var_domains[var])))
 
 
 def Q3test():
@@ -20,7 +75,8 @@ def Q3test():
             'waimakariri': {'red', 'green'},
         },
         constraints={
-            lambda christchurch, waimakariri, selwyn: christchurch != waimakariri and christchurch != selwyn and selwyn != waimakariri,
+            lambda christchurch, waimakariri,
+                   selwyn: christchurch != waimakariri and christchurch != selwyn and selwyn != waimakariri,
         }
     )
 
@@ -84,6 +140,7 @@ def Q1test():
         solution['d1'], "", solution['d2'], fillvalue=" ")]
     pretty_puzzle[0:5:2] = solution['a1'], solution['a3'], "  " + solution['a4']
     print("\n".join(pretty_puzzle))
+
 
 if __name__ == "__main__":
     main()
