@@ -1,0 +1,10 @@
+P(A=true) = 0.20000
+P(A=false) = 0.80000
+P(B=true|A=false) = 0.70000
+P(B=false|A=false) = 0.30000
+P(B=true) = 0.71000
+P(B=false) = 0.29000
+Probability of a burglary when both
+John and Mary have called: 0.284
+Probability of John calling if
+Mary has called: 0.17758
