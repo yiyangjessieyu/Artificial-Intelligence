@@ -1,0 +1,11 @@
+12
+[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+P(X1=True | Spam=False) = 0.35570
+P(X1=False| Spam=False) = 0.64430
+P(X1=True | Spam=True ) = 0.66667
+P(X1=False| Spam=True ) = 0.33333
+With Laplacian smoothing:
+P(X1=True | Spam=False) = 0.35762
+P(X1=False| Spam=False) = 0.64238
+P(X1=True | Spam=True ) = 0.66038
+P(X1=False| Spam=True ) = 0.33962

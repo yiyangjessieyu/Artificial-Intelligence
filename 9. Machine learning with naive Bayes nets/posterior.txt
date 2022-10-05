@@ -1,0 +1,9 @@
+P(C=False|observation) is approximately 0.00248
+P(C=True |observation) is approximately 0.99752
+P(C=False|observation) is approximately 0.29845
+P(C=True |observation) is approximately 0.70155
+P(C=False|observation) is approximately 0.99454
+P(C=True |observation) is approximately 0.00546
+P(C=False|observation) is approximately 0.99987
+P(C=True |observation) is approximately 0.00013
+

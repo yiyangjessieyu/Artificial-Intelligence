@@ -1,0 +1,7 @@
+Prior probability of spam is 0.25500.
+Prior probability of not spam is 0.74500.
+0.25743
+0.25980
+0.27727
+0.37750
+0.47773
