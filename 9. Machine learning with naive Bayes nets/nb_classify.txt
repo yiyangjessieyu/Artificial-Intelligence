@@ -1,0 +1,10 @@
+Prediction: Not Spam, Certainty: 0.99351
+Prediction: Spam, Certainty: 0.57441
+Prediction: Spam, Certainty: 0.59337
+Prediction: Spam, Certainty: 0.83465
+Prediction: Not Spam, Certainty: 0.99140
+Prediction: Not Spam, Certainty: 0.99213
+Prediction: Spam, Certainty: 0.57759
+Prediction: Spam, Certainty: 0.59073
+Prediction: Spam, Certainty: 0.83059
+Prediction: Not Spam, Certainty: 0.98989
