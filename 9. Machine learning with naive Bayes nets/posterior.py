@@ -1,14 +1,14 @@
 def posterior(prior, likelihood, observation):
-    class_true, class_false = prior, 1 - prior
+    class_false, class_true = 1 - prior, prior
 
-    for i,  value_tup in enumerate(likelihood):
+    for i,  likelihood_tup in enumerate(likelihood):
 
-        observed = observation[i]
+        is_observed_true = observation[i]
 
-        value_class_false, value_class_true = value_tup
+        class_false_likelihood, class_true_likelihood = likelihood_tup
 
-        class_true *= value_class_true if observed else 1 - value_class_true
-        class_false *= value_class_false if observed else 1 - value_class_false
+        class_false *= class_false_likelihood if is_observed_true else 1 - class_false_likelihood
+        class_true *= class_true_likelihood if is_observed_true else 1 - class_true_likelihood
 
     sum = class_true + class_false
 
