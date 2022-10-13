@@ -2,15 +2,45 @@ import math
 
 
 def knn_predict(input, examples, distance, combine, k):
-    distances = [euclidean_distance([input][0], pair[0]) for pair in examples]
-    print(distances)
-    neighbor_pair = [examples[i] for i, distance in enumerate(distances) if input[0] - distance <= k]
-    neighbor_values = [examples[i][1] for i, distance in enumerate(distances) if input[0] - distance <= k]
-    print(neighbor_pair)
-    if input == [4]:
-        print(distances, neighbor_values)
-    output = majority_element(neighbor_values)
+    neighbor_outputs = []
+
+    example_input_output_distance = []
+    for example_input, examples_output in examples:
+        example_input_output_distance.append(
+            {
+                'example_input': example_input,
+                'examples_output': examples_output,
+                'distance': euclidean_distance(input, example_input)
+            }
+        )
+        print(input, example_input)
+
+
+
+    distance_input_output = {}
+    for example_input, examples_output in examples:
+        distance = euclidean_distance(input, example_input)
+        if distance not in distance_input_output.keys():
+            distance_input_output[distance] = [(example_input, examples_output)]
+        else:
+            distance_input_output[distance].append((example_input, examples_output))
+
+    example_input_output_distance.sort(key=get_distance)
+    i = 0
+    while k > 0:
+        print("k is: " + str(k))
+        neighbor_outputs.append(example_input_output_distance[i].get('examples_output'))
+        i += 1
+        k -= 1
+
+    print("neighbor output is: " + str(neighbor_outputs))
+    output = majority_element(neighbor_outputs)
     return output
+
+
+# custom functions to get employee info
+def get_distance(example):
+    return example.get('distance')
 
 
 def euclidean_distance(v1, v2):
@@ -26,7 +56,6 @@ def majority_element(labels):
     max_labels = [label for label, count in count_dict.items() if max_count == count]
 
     return max_labels[-1]
-
 
 
 def main():
