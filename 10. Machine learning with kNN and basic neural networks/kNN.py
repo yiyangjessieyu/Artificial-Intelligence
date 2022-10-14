@@ -2,7 +2,6 @@ import math
 
 
 def knn_predict(input, examples, distance, combine, k):
-    neighbor_outputs = []
 
     example_input_output_distance = []
     for example_input, examples_output in examples:
@@ -10,31 +9,20 @@ def knn_predict(input, examples, distance, combine, k):
             {
                 'example_input': example_input,
                 'examples_output': examples_output,
-                'distance': euclidean_distance(input, example_input)
+                'distance': distance(input, example_input)
             }
         )
-        print(input, example_input)
-
-
-
-    distance_input_output = {}
-    for example_input, examples_output in examples:
-        distance = euclidean_distance(input, example_input)
-        if distance not in distance_input_output.keys():
-            distance_input_output[distance] = [(example_input, examples_output)]
-        else:
-            distance_input_output[distance].append((example_input, examples_output))
 
     example_input_output_distance.sort(key=get_distance)
-    i = 0
-    while k > 0:
-        print("k is: " + str(k))
-        neighbor_outputs.append(example_input_output_distance[i].get('examples_output'))
-        i += 1
-        k -= 1
 
-    print("neighbor output is: " + str(neighbor_outputs))
-    output = majority_element(neighbor_outputs)
+    neighbor_outputs = [neighbor_dict['examples_output'] for neighbor_dict in example_input_output_distance[:k]]
+
+    farthest_selected = example_input_output_distance[k-1]['distance']
+    neighbor_outputs += [nearest_unselected_dict['examples_output']
+                         for nearest_unselected_dict in example_input_output_distance[k:]
+                         if nearest_unselected_dict['distance'] == farthest_selected]
+
+    output = combine(neighbor_outputs)
     return output
 
 
@@ -54,8 +42,9 @@ def majority_element(labels):
     max_count = count_dict[max(count_dict, key=count_dict.get)]
 
     max_labels = [label for label, count in count_dict.items() if max_count == count]
+    max_labels.sort()
 
-    return max_labels[-1]
+    return max_labels[0]
 
 
 def main():
